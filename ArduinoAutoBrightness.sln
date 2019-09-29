@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ArduinoAutoBrightness.Shared", "ArduinoAutoBrightness.Shared\ArduinoAutoBrightness.Shared.shproj", "{4C64AA30-A5D3-4FA0-82B6-E6E3A8790402}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArduinoAutoBrightness.ConsoleApp", "ArduinoAutoBrightness.ConsoleApp\ArduinoAutoBrightness.ConsoleApp.csproj", "{72411EFA-28C1-4EAE-857F-9A7553A5ED67}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArduinoFirmataSDK", "ArduinoFirmataSDK\ArduinoFirmataSDK.csproj", "{978DB44C-D550-4A5D-9B23-C0EE3DA2A306}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArduinoAutoBrightness.DesktopApp", "ArduinoAutoBrightness.DesktopApp\ArduinoAutoBrightness.DesktopApp.csproj", "{07E43AAE-3F84-488F-82E2-74BBA93349CC}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		ArduinoAutoBrightness.Shared\ArduinoAutoBrightness.Shared.projitems*{4c64aa30-a5d3-4fa0-82b6-e6e3a8790402}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72411EFA-28C1-4EAE-857F-9A7553A5ED67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72411EFA-28C1-4EAE-857F-9A7553A5ED67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72411EFA-28C1-4EAE-857F-9A7553A5ED67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72411EFA-28C1-4EAE-857F-9A7553A5ED67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{978DB44C-D550-4A5D-9B23-C0EE3DA2A306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{978DB44C-D550-4A5D-9B23-C0EE3DA2A306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{978DB44C-D550-4A5D-9B23-C0EE3DA2A306}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{978DB44C-D550-4A5D-9B23-C0EE3DA2A306}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07E43AAE-3F84-488F-82E2-74BBA93349CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07E43AAE-3F84-488F-82E2-74BBA93349CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07E43AAE-3F84-488F-82E2-74BBA93349CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07E43AAE-3F84-488F-82E2-74BBA93349CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7EAAFCE5-F0A7-438F-81BF-534BC498E3CF}
+	EndGlobalSection
+EndGlobal
