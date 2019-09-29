@@ -1,6 +1,8 @@
-﻿namespace ArduinoAutoBrightness.DesktopApp
+﻿using System;
+
+namespace ArduinoAutoBrightness.DesktopApp
 {
-    partial class FormMain
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -53,6 +55,7 @@
             this.trayIcon.Text = "Auto Brightness";
             this.trayIcon.Visible = true;
             this.trayIcon.Icon = System.Drawing.SystemIcons.Application;
+            this.trayIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TrayIcon_MouseClick);
             // 
             // tbLog
             // 
@@ -198,8 +201,9 @@
             this.bRefreshCom.TabIndex = 5;
             this.bRefreshCom.Text = "Refresh";
             this.bRefreshCom.UseVisualStyleBackColor = true;
+            this.bRefreshCom.Click += new System.EventHandler(this.bRefreshCom_Click);
             // 
-            // FormMain
+            // MainForm
             // 
             this.ClientSize = new System.Drawing.Size(605, 381);
             this.Controls.Add(this.cbComPorts);
@@ -218,6 +222,7 @@
             this.Controls.Add(this.bRefreshCom);
             this.Name = "FormMain";
             this.Text = "Arduino Auto Brigntness";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Resize += new System.EventHandler(this.FormMain_Resize);

@@ -65,6 +65,7 @@ namespace LattePanda.Firmata
         #endregion
 
         private Thread _readThread = null;
+        private bool isDisposed = false;
         #endregion
 
         #region Constructors
@@ -139,21 +140,37 @@ namespace LattePanda.Firmata
         #region Event Handlers
         internal void OnDidI2CDataReveive(byte address, byte register, byte[] data)
         {
+            if (isDisposed)
+            {
+                return;
+            }
             DidI2CDataReveive?.Invoke(address, register, data);
         }
 
         internal void OnDigitalPinChanged(byte pin, ArduinoDigitalValue state)
         {
+            if (isDisposed)
+            {
+                return;
+            }
             DigitalPinChanged?.Invoke(pin, state);
         }
 
         internal void OnAnalogPinChanged(int pin, int value)
         {
+            if (isDisposed)
+            {
+                return;
+            }
             AnalogPinChanged?.Invoke(pin, value);
         }
 
         internal void OnConnectionLost()
         {
+            if (isDisposed)
+            {
+                return;
+            }
             ConnectionLost?.Invoke();
         }
         #endregion
@@ -237,7 +254,7 @@ namespace LattePanda.Firmata
             autoEvent.WaitOne();
             // This line will executes only when inputProcessor are done. For example serialPort is closed.
             stateTimer.Dispose();
-            ConnectionLost();
+            OnConnectionLost();
         }
         #endregion
 
@@ -384,6 +401,7 @@ namespace LattePanda.Firmata
         
         public void Dispose()
         {
+            isDisposed = true;
             Close();
         }
     }

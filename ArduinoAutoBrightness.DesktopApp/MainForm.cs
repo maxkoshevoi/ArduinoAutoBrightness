@@ -1,20 +1,14 @@
-﻿using ArduinoAutoBrightness.Shared;
+﻿using ArduinoAutoBrightness.DesktopApp.Extensions;
+using ArduinoAutoBrightness.Shared;
 using LattePanda.Firmata;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using ArduinoAutoBrightness.DesktopApp.Extentions;
 
 namespace ArduinoAutoBrightness.DesktopApp
 {
-    public partial class FormMain : Form
+    public partial class MainForm : Form
     {
+        #region Variables
         private Arduino arduino = null;
         private bool _autoAdjustBrightness = false;
         private bool autoAdjustBrightness 
@@ -34,13 +28,14 @@ namespace ArduinoAutoBrightness.DesktopApp
             }
         }
         private bool forceMinimizeToTray = false;
+        #endregion
 
-        public FormMain()
+        public MainForm()
         {
             InitializeComponent();
-            trayIcon.MouseClick += NotifyIcon_MouseClick;
         }
 
+        #region Form Events
         private void FormMain_Load(object sender, EventArgs e)
         {
             autoAdjustBrightness = true;
@@ -59,20 +54,16 @@ namespace ArduinoAutoBrightness.DesktopApp
             arduino?.Dispose();
         }
 
-        private void UpdatePorts()
+        private void FormMain_Resize(object sender, EventArgs e)
         {
-            cbComPorts.Items.Clear();
-            foreach (var portName in Arduino.GetAvailablePorts())
+            bool cursorNotInBar = Screen.GetWorkingArea(this).Contains(Cursor.Position);
+            if (WindowState == FormWindowState.Minimized && (forceMinimizeToTray || cursorNotInBar))
             {
-                cbComPorts.Items.Add(portName);
-            }
-            if (cbComPorts.Items.Count > 0)
-            {
-                cbComPorts.SelectedIndex = 0;
-            }
-            else
-            {
-                Log("Arduino not found.");
+                forceMinimizeToTray = false;
+
+                ShowInTaskbar = false;
+                trayIcon.Visible = true;
+                Hide();
             }
         }
 
@@ -94,11 +85,56 @@ namespace ArduinoAutoBrightness.DesktopApp
             catch (Exception ex)
             {
                 Log($"FAIL: {ex.Message}", addTimestamp: false);
+                return;
             }
             Log("DONE", addTimestamp: false);
 
             arduino.AnalogPinChanged += Arduino_AnalogPinUpdated;
             arduino.ConnectionLost += Arduino_ConnectionLost;
+        }
+
+        private void bRefreshCom_Click(object sender, EventArgs e)
+        {
+            UpdatePorts();
+        }
+
+        private void numMonitorBr_ValueChanged(object sender, EventArgs e)
+        {
+            MonitorBrightness.Set((int)numMonitorBr.Value);
+            Log($"Brightness manually changed to {(int)numMonitorBr.Value}%");
+        }
+
+        private void bTuggleAutoAdjust_Click(object sender, EventArgs e)
+        {
+            autoAdjustBrightness = !autoAdjustBrightness;
+        }
+
+        private void TrayIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            trayIcon.Visible = false;
+            ShowInTaskbar = true;
+        }
+        #endregion
+
+        #region Methods
+        private void UpdatePorts()
+        {
+            cbComPorts.SelectedIndex = -1;
+            cbComPorts.Items.Clear();
+            foreach (var portName in Arduino.GetAvailablePorts())
+            {
+                cbComPorts.Items.Add(portName);
+            }
+            if (cbComPorts.Items.Count > 0)
+            {
+                cbComPorts.SelectedIndex = 0;
+            }
+            else
+            {
+                Log("Arduino not found.");
+            }
         }
 
         private void Log(string message, bool newLine = true, bool addTimestamp = true)
@@ -118,6 +154,15 @@ namespace ArduinoAutoBrightness.DesktopApp
             });
         }
 
+        private void UpdateMonitorBrightness(int newBrightness)
+        {
+            numMonitorBr.ValueChanged -= numMonitorBr_ValueChanged;
+            numMonitorBr.Value = newBrightness;
+            numMonitorBr.ValueChanged += numMonitorBr_ValueChanged;
+        }
+        #endregion
+
+        #region Arduino Events
         private void Arduino_ConnectionLost()
         {
             Log("Connection lost");
@@ -149,44 +194,6 @@ namespace ArduinoAutoBrightness.DesktopApp
                 });
             }
         }
-
-        private void UpdateMonitorBrightness(int newBrightness)
-        {
-            numMonitorBr.ValueChanged -= numMonitorBr_ValueChanged;
-            numMonitorBr.Value = newBrightness;
-            numMonitorBr.ValueChanged += numMonitorBr_ValueChanged;
-        }
-
-        private void numMonitorBr_ValueChanged(object sender, EventArgs e)
-        {
-            MonitorBrightness.Set((int)numMonitorBr.Value);
-            Log($"Brightness manually changed to {(int)numMonitorBr.Value}%");
-        }
-
-        private void bTuggleAutoAdjust_Click(object sender, EventArgs e)
-        {
-            autoAdjustBrightness = !autoAdjustBrightness;
-        }
-
-        private void FormMain_Resize(object sender, EventArgs e)
-        {
-            bool cursorNotInBar = Screen.GetWorkingArea(this).Contains(Cursor.Position);
-            if (WindowState == FormWindowState.Minimized && (forceMinimizeToTray || cursorNotInBar))
-            {
-                forceMinimizeToTray = false;
-
-                ShowInTaskbar = false;
-                trayIcon.Visible = true;
-                Hide();
-            }
-        }
-
-        private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
-        {
-            Show();
-            WindowState = FormWindowState.Normal;
-            trayIcon.Visible = false;
-            ShowInTaskbar = true;
-        }
+        #endregion
     }
 }

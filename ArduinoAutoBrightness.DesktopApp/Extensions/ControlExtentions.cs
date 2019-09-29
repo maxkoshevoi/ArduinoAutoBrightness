@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace ArduinoAutoBrightness.DesktopApp.Extentions
+namespace ArduinoAutoBrightness.DesktopApp.Extensions
 {
-    public static class ControlExtentions
+    public static class ControlExtensions
     {
         public static void Invoke(this Control control, Action action)
         {
