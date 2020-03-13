@@ -5,6 +5,10 @@ namespace ArduinoAutoBrightness.Shared
 {
     public static class BrightnessAdjustment
     {
+        public static DateTime? LastManualChange { get; private set; }
+
+        public static DateTime InactiveUntil { get; private set; }
+
         /// <summary>
         /// Changes monitor brightness according to light sensor value
         /// </summary>
@@ -13,12 +17,27 @@ namespace ArduinoAutoBrightness.Shared
         /// <returns>New monitor brightness (from 0 to 100) or NULL if it didn't change</returns>
         public static int? AdjustBrightness(int sensorValue)
         {
+            if (DateTime.Now < InactiveUntil)
+            {
+                return null;
+            }
+
             int neededBrightness = GetRecommendedBrightness(sensorValue);
             int currentBrightness = MonitorBrightness.Get();
             int difference = Math.Abs(neededBrightness - currentBrightness);
 
+            if (MonitorBrightness.LastChangedTo != null && currentBrightness != MonitorBrightness.LastChangedTo)
+            {
+                if (LastManualChange.TimePassed()?.TotalSeconds < 3)
+                {
+                    InactiveUntil = DateTime.Now.AddSeconds(10);
+                    return null;
+                }
+                LastManualChange = DateTime.Now;
+            }
+
             if (difference <= 1 ||
-                (difference < 10 && MonitorBrightness.SinceLastChanged.TotalSeconds < 3))
+                (difference < 10 && MonitorBrightness.LastChanged.TimePassed().TotalSeconds < 3))
             {
                 return null;
             }
@@ -43,6 +62,16 @@ namespace ArduinoAutoBrightness.Shared
                 Thread.Sleep(1);
             }
             MonitorBrightness.Set(neededBrightness);
+        }
+
+        public static TimeSpan? TimePassed(this DateTime? date)
+        {
+            return DateTime.Now - date;
+        }
+        
+        public static TimeSpan TimePassed(this DateTime date)
+        {
+            return DateTime.Now - date;
         }
     }
 }
