@@ -2,6 +2,7 @@
 using ArduinoAutoBrightness.Shared;
 using LattePanda.Firmata;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ArduinoAutoBrightness.DesktopApp
@@ -119,7 +120,7 @@ namespace ArduinoAutoBrightness.DesktopApp
         #endregion
 
         #region Methods
-        private void UpdatePorts()
+        private bool UpdatePorts()
         {
             cbComPorts.SelectedIndex = -1;
             cbComPorts.Items.Clear();
@@ -130,10 +131,12 @@ namespace ArduinoAutoBrightness.DesktopApp
             if (cbComPorts.Items.Count > 0)
             {
                 cbComPorts.SelectedIndex = 0;
+                return true;
             }
             else
             {
                 Log("Arduino not found.");
+                return false;
             }
         }
 
@@ -163,12 +166,50 @@ namespace ArduinoAutoBrightness.DesktopApp
         #endregion
 
         #region Arduino Events
-        private void Arduino_ConnectionLost()
+        private async void Arduino_ConnectionLost()
         {
             Log("Connection lost");
-            cbComPorts.BeginInvoke(() =>
+
+            await RetryConnect(false);
+        }
+
+        private async Task<bool> RetryConnect(bool isRetryOnce)
+        {
+            TimeSpan[] delays =
             {
-                UpdatePorts();
+                TimeSpan.FromSeconds(0),
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(15),
+                TimeSpan.FromSeconds(30),
+                TimeSpan.FromSeconds(60),
+            };
+            bool retrySuccessfull = false;
+
+            return await Task.Run(async () =>
+            {
+                int delayIndex = 0;
+
+                while (true)
+                {
+                    TimeSpan delay = delays[delayIndex];
+                    Log($"Retrying after {delay.TotalSeconds} s.");
+                    await Task.Delay(delay);
+
+                    cbComPorts.Invoke(() =>
+                    {
+                        retrySuccessfull = UpdatePorts();
+                    });
+
+                    if (retrySuccessfull || isRetryOnce)
+                    {
+                        return retrySuccessfull;
+                    }
+                    if (delayIndex < delays.Length - 1)
+                    {
+                        delayIndex++;
+                    }
+                }
             });
         }
 

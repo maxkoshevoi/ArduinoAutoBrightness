@@ -28,9 +28,9 @@ namespace ArduinoAutoBrightness.Shared
 
             if (MonitorBrightness.LastChangedTo != null && currentBrightness != MonitorBrightness.LastChangedTo)
             {
-                if (LastManualChange.TimePassed()?.TotalSeconds < 3)
+                if (LastManualChange.TimePassed()?.TotalSeconds < 1)
                 {
-                    InactiveUntil = DateTime.Now.AddSeconds(10);
+                    InactiveUntil = DateTime.Now.AddSeconds(5);
                     return null;
                 }
                 LastManualChange = DateTime.Now;

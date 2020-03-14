@@ -10,9 +10,9 @@ namespace ArduinoAutoBrightness.DesktopApp.Extensions
             control.Invoke(action);
         }
 
-        public static void BeginInvoke(this Control control, Action action)
+        public static IAsyncResult BeginInvoke(this Control control, Action action)
         {
-            control.BeginInvoke(action);
+            return control.BeginInvoke(action);
         }
     }
 }
