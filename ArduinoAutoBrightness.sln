@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArduinoAutoBrightness.Deskt
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		ArduinoAutoBrightness.Shared\ArduinoAutoBrightness.Shared.projitems*{07e43aae-3f84-488f-82e2-74bba93349cc}*SharedItemsImports = 5
 		ArduinoAutoBrightness.Shared\ArduinoAutoBrightness.Shared.projitems*{4c64aa30-a5d3-4fa0-82b6-e6e3a8790402}*SharedItemsImports = 13
+		ArduinoAutoBrightness.Shared\ArduinoAutoBrightness.Shared.projitems*{72411efa-28c1-4eae-857f-9a7553a5ed67}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
