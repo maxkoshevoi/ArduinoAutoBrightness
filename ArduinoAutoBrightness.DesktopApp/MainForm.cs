@@ -29,6 +29,7 @@ namespace ArduinoAutoBrightness.DesktopApp
             }
         }
         private bool forceMinimizeToTray = false;
+        private GlobalBrightnessController GlobalBrightnessController = null;
         #endregion
 
         public MainForm()
@@ -40,8 +41,10 @@ namespace ArduinoAutoBrightness.DesktopApp
         private void FormMain_Load(object sender, EventArgs e)
         {
             autoAdjustBrightness = true;
+            GlobalBrightnessController = new GlobalBrightnessController();
             UpdatePorts();
-            UpdateMonitorBrightness(MonitorBrightness.Get());
+
+            UpdateMonitorBrightness(GlobalBrightnessController.Get());
 
             if (chLaunchMin.Checked)
             {
@@ -101,7 +104,7 @@ namespace ArduinoAutoBrightness.DesktopApp
 
         private void numMonitorBr_ValueChanged(object sender, EventArgs e)
         {
-            MonitorBrightness.Set((int)numMonitorBr.Value);
+            GlobalBrightnessController.Set((int)numMonitorBr.Value);
             Log($"Brightness manually changed to {(int)numMonitorBr.Value}%");
         }
 
@@ -148,7 +151,7 @@ namespace ArduinoAutoBrightness.DesktopApp
             }
             if (addTimestamp)
             {
-                message = $"{DateTime.Now.ToString()} - {message}";
+                message = $"{DateTime.Now} - {message}";
             }
             tbLog.BeginInvoke(() =>
             {

@@ -3,11 +3,8 @@ using System.Management;
 
 namespace ArduinoAutoBrightness.Shared
 {
-    public static class MonitorBrightness
+    public static class WindowsSettingsBrightnessController
     {
-        public static DateTime LastChanged { get; private set; }
-        public static int? LastChangedTo { get; private set; }
-
         public static int Get()
         {
             using var mclass = new ManagementClass("WmiMonitorBrightness")
@@ -34,8 +31,6 @@ namespace ArduinoAutoBrightness.Shared
             {
                 instance.InvokeMethod("WmiSetBrightness", args);
             }
-            LastChanged = DateTime.Now;
-            LastChangedTo = brightness;
         }
     }
 }

@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BrightnessAdjustment.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MonitorBrightness.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalBrightnessController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PhisicalMonitorBrightnessController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WindowsSettingsBrightnessController.cs" />
   </ItemGroup>
 </Project>

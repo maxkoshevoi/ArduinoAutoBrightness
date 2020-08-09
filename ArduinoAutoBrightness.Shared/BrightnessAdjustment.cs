@@ -9,6 +9,8 @@ namespace ArduinoAutoBrightness.Shared
 
         public static DateTime InactiveUntil { get; private set; }
 
+        public static GlobalBrightnessController BrightnessController { get; } = new GlobalBrightnessController();
+
         /// <summary>
         /// Changes monitor brightness according to light sensor value
         /// </summary>
@@ -23,10 +25,10 @@ namespace ArduinoAutoBrightness.Shared
             }
 
             int neededBrightness = GetRecommendedBrightness(sensorValue);
-            int currentBrightness = MonitorBrightness.Get();
+            int currentBrightness = BrightnessController.Get();
             int difference = Math.Abs(neededBrightness - currentBrightness);
 
-            if (MonitorBrightness.LastChangedTo != null && currentBrightness != MonitorBrightness.LastChangedTo)
+            if (BrightnessController.LastChangedTo != null && currentBrightness != BrightnessController.LastChangedTo)
             {
                 if (LastManualChange.TimePassed()?.TotalSeconds < 1)
                 {
@@ -37,7 +39,7 @@ namespace ArduinoAutoBrightness.Shared
             }
 
             if (difference <= 1 ||
-                (difference < 10 && MonitorBrightness.LastChanged.TimePassed().TotalSeconds < 3))
+                (difference < 10 && BrightnessController.LastChanged.TimePassed().TotalSeconds < 3))
             {
                 return null;
             }
@@ -58,10 +60,10 @@ namespace ArduinoAutoBrightness.Shared
             int dirrection = neededBrightness > currentBrightness ? 1 : -1;
             for (int i = currentBrightness; Math.Abs(neededBrightness - i) > increment; i += increment * dirrection)
             {
-                MonitorBrightness.Set(i);
+                BrightnessController.Set(i);
                 Thread.Sleep(1);
             }
-            MonitorBrightness.Set(neededBrightness);
+            BrightnessController.Set(neededBrightness);
         }
 
         public static TimeSpan? TimePassed(this DateTime? date)
