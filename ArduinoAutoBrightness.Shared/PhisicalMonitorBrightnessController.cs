@@ -40,14 +40,14 @@ namespace ArduinoAutoBrightness.Shared
 
         public PhisicalMonitorBrightnessController()
         {
-            this.displays = GetDisplays();
+            this.monitors = GetDisplays();
         }
 
-        private readonly IReadOnlyCollection<DisplayInfo> displays;
+        private readonly IReadOnlyCollection<DisplayInfo> monitors;
 
         public void Set(uint brightness)
         {
-            foreach (var monitor in displays)
+            foreach (var monitor in monitors)
             {
                 uint realNewValue = (monitor.MaxValue - monitor.MinValue) * brightness / 100 + monitor.MinValue;
                 if (SetMonitorBrightness(monitor.Handle, realNewValue))
@@ -59,19 +59,19 @@ namespace ArduinoAutoBrightness.Shared
 
         public int Get()
         {
-            if (!displays.Any())
+            if (!monitors.Any())
             {
                 return -1;
             }
-            return (int)displays.Average(d => d.CurrentValue);
+            return (int)monitors.Average(d => d.CurrentValue);
         }
 
         public void Dispose()
         {
-            if (displays.Any())
+            if (monitors.Any())
             {
-                PHYSICAL_MONITOR[] monitorArray = displays.Select(m => new PHYSICAL_MONITOR { hPhysicalMonitor = m.Handle }).ToArray();
-                DestroyPhysicalMonitors((uint)displays.Count, ref monitorArray);
+                PHYSICAL_MONITOR[] monitorArray = monitors.Select(m => new PHYSICAL_MONITOR { hPhysicalMonitor = m.Handle }).ToArray();
+                DestroyPhysicalMonitors((uint)monitors.Count, ref monitorArray);
             }
             GC.SuppressFinalize(this);
         }
