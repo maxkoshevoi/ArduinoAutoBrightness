@@ -40,12 +40,17 @@ namespace ArduinoAutoBrightness.Shared
 
         public PhisicalMonitorBrightnessController()
         {
-            this.monitors = GetDisplays();
+            this.monitors = GetMonitors();
         }
 
-        private readonly IReadOnlyCollection<DisplayInfo> monitors;
+        private IReadOnlyCollection<DisplayInfo> monitors;
 
         public void Set(uint brightness)
+        {
+            Set(brightness, true);
+        }
+
+        private void Set(uint brightness, bool refreshMonitorsOnFail)
         {
             foreach (var monitor in monitors)
             {
@@ -53,6 +58,12 @@ namespace ArduinoAutoBrightness.Shared
                 if (SetMonitorBrightness(monitor.Handle, realNewValue))
                 {
                     monitor.CurrentValue = realNewValue;
+                }
+                else if (refreshMonitorsOnFail)
+                {
+                    monitors = GetMonitors();
+                    Set(brightness, false);
+                    return;
                 }
             }
         }
@@ -76,7 +87,7 @@ namespace ArduinoAutoBrightness.Shared
             GC.SuppressFinalize(this);
         }
 
-        private List<DisplayInfo> GetDisplays()
+        private List<DisplayInfo> GetMonitors()
         {
             var displays = new List<DisplayInfo>();
             EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData) =>
