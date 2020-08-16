@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 
 namespace ArduinoAutoBrightness.Shared
 {
-
     public class PhisicalMonitorBrightnessController : IDisposable
     {
         #region DllImport
