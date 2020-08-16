@@ -31,78 +31,79 @@ namespace ArduinoAutoBrightness.Shared
         
         [DllImport("dxva2.dll", EntryPoint = "DestroyPhysicalMonitors")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DestroyPhysicalMonitors(uint dwPhysicalMonitorArraySize, ref PHYSICAL_MONITOR[] pPhysicalMonitorArray);
+        public static extern bool DestroyPhysicalMonitors(uint dwPhysicalMonitorArraySize, [In] PHYSICAL_MONITOR[] pPhysicalMonitorArray);
 
         [DllImport("user32.dll")]
         static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, IntPtr dwData);
         delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
         #endregion
 
+        private IReadOnlyCollection<MonitorInfo> Monitors { get; set; }
+
         public PhisicalMonitorBrightnessController()
         {
-            this.monitors = GetMonitors();
+            UpdateMonitors();
         }
 
-        private IReadOnlyCollection<DisplayInfo> monitors;
-
+        #region Get & Set
         public void Set(uint brightness)
         {
             Set(brightness, true);
         }
 
-        private void Set(uint brightness, bool refreshMonitorsOnFail)
+        private void Set(uint brightness, bool refreshMonitorsIfNeeded)
         {
-            foreach (var monitor in monitors)
+            bool isSomeFail = false;
+            foreach (var monitor in Monitors)
             {
                 uint realNewValue = (monitor.MaxValue - monitor.MinValue) * brightness / 100 + monitor.MinValue;
                 if (SetMonitorBrightness(monitor.Handle, realNewValue))
                 {
                     monitor.CurrentValue = realNewValue;
                 }
-                else if (refreshMonitorsOnFail)
+                else if (refreshMonitorsIfNeeded)
                 {
-                    monitors = GetMonitors();
-                    Set(brightness, false);
-                    return;
+                    isSomeFail = true;
+                    break;
                 }
+            }
+
+            if (refreshMonitorsIfNeeded && (isSomeFail || !Monitors.Any()))
+            {
+                UpdateMonitors();
+                Set(brightness, false);
+                return;
             }
         }
 
         public int Get()
         {
-            if (!monitors.Any())
+            if (!Monitors.Any())
             {
                 return -1;
             }
-            return (int)monitors.Average(d => d.CurrentValue);
+            return (int)Monitors.Average(d => d.CurrentValue);
         }
+        #endregion
 
-        public void Dispose()
+        private void UpdateMonitors()
         {
-            if (monitors.Any())
-            {
-                PHYSICAL_MONITOR[] monitorArray = monitors.Select(m => new PHYSICAL_MONITOR { hPhysicalMonitor = m.Handle }).ToArray();
-                DestroyPhysicalMonitors((uint)monitors.Count, ref monitorArray);
-            }
-            GC.SuppressFinalize(this);
-        }
+            DisposeMonitors(this.Monitors);
 
-        private List<DisplayInfo> GetMonitors()
-        {
-            var displays = new List<DisplayInfo>();
+            var monitors = new List<MonitorInfo>();
             EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData) =>
             {
                 uint physicalMonitorsCount = 0;
                 if (!GetNumberOfPhysicalMonitorsFromHMONITOR(hMonitor, ref physicalMonitorsCount))
                 {
-                    // Cannot get monitor count!
+                    // Cannot get monitor count
                     return true;
                 }
 
                 var physicalMonitors = new PHYSICAL_MONITOR[physicalMonitorsCount];
                 if (!GetPhysicalMonitorsFromHMONITOR(hMonitor, physicalMonitorsCount, physicalMonitors))
                 {
-                    // Cannot get phisical monitor handle!
+                    // Cannot get phisical monitor handle
                     return true;
                 }
 
@@ -111,24 +112,39 @@ namespace ArduinoAutoBrightness.Shared
                     uint minValue = 0, currentValue = 0, maxValue = 0;
                     if (!GetMonitorBrightness(physicalMonitor.hPhysicalMonitor, ref minValue, ref currentValue, ref maxValue))
                     {
-                        var t = DestroyPhysicalMonitor(physicalMonitor.hPhysicalMonitor);
+                        DestroyPhysicalMonitor(physicalMonitor.hPhysicalMonitor);
                         continue;
                     }
 
-                    var info = new DisplayInfo
+                    var info = new MonitorInfo
                     {
                         Handle = physicalMonitor.hPhysicalMonitor,
                         MinValue = minValue,
                         CurrentValue = currentValue,
                         MaxValue = maxValue,
                     };
-                    displays.Add(info);
+                    monitors.Add(info);
                 }
 
                 return true;
             }, IntPtr.Zero);
 
-            return displays;
+            this.Monitors = monitors;
+        }
+
+        public void Dispose()
+        {
+            DisposeMonitors(Monitors);
+            GC.SuppressFinalize(this);
+        }
+
+        private static void DisposeMonitors(IEnumerable<MonitorInfo> monitors)
+        {
+            if (monitors?.Any() == true)
+            {
+                PHYSICAL_MONITOR[] monitorArray = monitors.Select(m => new PHYSICAL_MONITOR { hPhysicalMonitor = m.Handle }).ToArray();
+                DestroyPhysicalMonitors((uint)monitorArray.Length, monitorArray);
+            }
         }
 
         #region Classes
@@ -150,7 +166,7 @@ namespace ArduinoAutoBrightness.Shared
             public int bottom;
         }
 
-        public class DisplayInfo
+        public class MonitorInfo
         {
             public uint MinValue { get; set; }
             public uint MaxValue { get; set; }

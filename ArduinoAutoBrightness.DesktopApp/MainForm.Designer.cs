@@ -31,6 +31,7 @@ namespace ArduinoAutoBrightness.DesktopApp
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.tbLog = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -52,9 +53,9 @@ namespace ArduinoAutoBrightness.DesktopApp
             // 
             // trayIcon
             // 
+            this.trayIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("trayIcon.Icon")));
             this.trayIcon.Text = "Auto Brightness";
             this.trayIcon.Visible = true;
-            this.trayIcon.Icon = System.Drawing.SystemIcons.Application;
             this.trayIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TrayIcon_MouseClick);
             // 
             // tbLog
@@ -183,8 +184,6 @@ namespace ArduinoAutoBrightness.DesktopApp
             // chAutoReconnect
             // 
             this.chAutoReconnect.AutoSize = true;
-            this.chAutoReconnect.Checked = false;
-            this.chAutoReconnect.CheckState = System.Windows.Forms.CheckState.Unchecked;
             this.chAutoReconnect.Enabled = false;
             this.chAutoReconnect.Location = new System.Drawing.Point(12, 59);
             this.chAutoReconnect.Name = "chAutoReconnect";
@@ -220,15 +219,16 @@ namespace ArduinoAutoBrightness.DesktopApp
             this.Controls.Add(this.label6);
             this.Controls.Add(this.chAutoReconnect);
             this.Controls.Add(this.bRefreshCom);
-            this.Name = "FormMain";
-            this.Text = "Arduino Auto Brigntness";
+            this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Arduino Auto Brigntness";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.Resize += new System.EventHandler(this.FormMain_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.numMonitorBr)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numSensor)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
