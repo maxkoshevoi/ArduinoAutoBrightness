@@ -75,11 +75,11 @@ namespace ArduinoAutoBrightness.Shared
             }
         }
 
-        public int Get()
+        public int? Get()
         {
             if (!Monitors.Any())
             {
-                return -1;
+                return null;
             }
             return (int)Monitors.Average(d => d.CurrentValue);
         }

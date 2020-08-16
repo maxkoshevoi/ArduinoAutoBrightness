@@ -1,6 +1,7 @@
 ﻿using ArduinoAutoBrightness.Shared;
 using LattePanda.Firmata;
 using System;
+using System.Threading.Tasks;
 
 namespace ArduinoAutoBrightness.ConsoleApp
 {
@@ -50,12 +51,14 @@ namespace ArduinoAutoBrightness.ConsoleApp
 
         private void Arduino_AnalogPinUpdated(int pin, int value)
         {
-            //Console.WriteLine(value);
-            int? newBrightness = BrightnessAdjustment.AdjustBrightness(value);
-            if (newBrightness.HasValue)
+            Task.Run(() =>
             {
-                Console.WriteLine(newBrightness);
-            }
+                int? newBrightness = BrightnessAdjustment.AdjustBrightness(value);
+                if (newBrightness.HasValue)
+                {
+                    Console.WriteLine(newBrightness);
+                }
+            });
         }
     }
 }

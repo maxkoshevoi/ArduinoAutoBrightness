@@ -229,15 +229,18 @@ namespace ArduinoAutoBrightness.DesktopApp
                 return;
             }
 
-            int? newBrightness = BrightnessAdjustment.AdjustBrightness(value);
-            if (newBrightness.HasValue)
+            Task.Run(() =>
             {
-                Log($"Brightness automatically changed to {newBrightness}%");
-                numMonitorBr.BeginInvoke(() =>
+                int? newBrightness = BrightnessAdjustment.AdjustBrightness(value);
+                if (newBrightness.HasValue)
                 {
-                    UpdateMonitorBrightness(newBrightness.Value);
-                });
-            }
+                    Log($"Brightness automatically changed to {newBrightness}%");
+                    numMonitorBr.BeginInvoke(() =>
+                    {
+                        UpdateMonitorBrightness(newBrightness.Value);
+                    });
+                }
+            });
         }
         #endregion
     }

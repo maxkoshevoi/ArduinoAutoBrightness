@@ -29,9 +29,9 @@ namespace ArduinoAutoBrightness.Shared
         public int Get()
         {
             int windowsBrightness = WindowsSettingsBrightnessController.Get();
-            int phisicalBrightness = PhisicalBrightnessController.Get();
+            int? phisicalBrightness = PhisicalBrightnessController.Get();
 
-            if (phisicalBrightness == -1)
+            if (phisicalBrightness is null)
             {
                 return windowsBrightness;
             }
