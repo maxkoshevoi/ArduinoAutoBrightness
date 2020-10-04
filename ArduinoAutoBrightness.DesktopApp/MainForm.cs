@@ -217,6 +217,8 @@ namespace ArduinoAutoBrightness.DesktopApp
             });
         }
 
+        Task updatingBrightness = Task.CompletedTask;
+
         private void Arduino_AnalogPinUpdated(int pin, int value)
         {
             numSensor.BeginInvoke(() =>
@@ -224,12 +226,12 @@ namespace ArduinoAutoBrightness.DesktopApp
                 numSensor.Value = value;
             });
 
-            if (!autoAdjustBrightness)
+            if (!autoAdjustBrightness || !updatingBrightness.IsCompleted)
             {
                 return;
             }
 
-            Task.Run(() =>
+            updatingBrightness = Task.Run(() =>
             {
                 int? newBrightness = BrightnessAdjustment.AdjustBrightness(value);
                 if (newBrightness.HasValue)
